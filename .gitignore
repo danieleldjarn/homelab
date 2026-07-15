@@ -1,0 +1,12 @@
+# OpenTofu / Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+
+# may contain secrets — we keep ours secret-free, but belt-and-suspenders
+*.tfvars
+
+crash.log
+
+# Ansible
+*.retry
