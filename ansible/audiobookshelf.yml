@@ -1,0 +1,51 @@
+- name: Install and configure Audiobookshelf
+  hosts: audiobookshelf
+
+  vars:
+    audiobookshelf_state: present # override with "-e audiobookshelf_state=latest" to upgrade
+    ffmpeg_state: present
+
+  tasks:
+    - name: Install ffmpeg
+      ansible.builtin.apt:
+        name: ffmpeg
+        state: "{{ ffmpeg_state }}"
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Add the Audiobookshelf apt repository
+      ansible.builtin.deb822_repository:
+        name: audiobookshelf
+        types: [deb]
+        uris: https://advplyr.github.io/audiobookshelf-ppa
+        suites: ./
+        signed_by: https://advplyr.github.io/audiobookshelf-ppa/KEY.gpg
+        enabled: true
+
+    - name: Install Audiobookshelf
+      ansible.builtin.apt:
+        name: audiobookshelf
+        state: "{{ audiobookshelf_state }}"
+        update_cache: true
+
+    - name: Point Audiobookshelf at the system ffmpeg
+      ansible.builtin.lineinfile:
+        path: /etc/default/audiobookshelf
+        regexp: "^{{ item.key }}="
+        line: "{{ item.key }}={{ item.value }}"
+      loop:
+        - { key: FFMPEG_PATH, value: /usr/bin/ffmpeg }
+        - { key: FFPROBE_PATH, value: /usr/bin/ffprobe }
+      notify: Restart audiobookshelf
+
+    - name: Ensure the service is running and enabled
+      ansible.builtin.systemd_service:
+        name: audiobookshelf
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Restart audiobookshelf
+      ansible.builtin.systemd_service:
+        name: audiobookshelf
+        state: restarted

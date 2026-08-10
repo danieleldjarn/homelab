@@ -1,0 +1,5 @@
+media:
+  hosts:
+    audiobookshelf:
+      ansible_host: 172.16.0.156
+      ansible_python_interpreter: /usr/bin/python3
