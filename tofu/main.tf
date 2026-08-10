@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_container" "audiobookshelf" {
   }
 
   lifecycle {
-    ignore_changes = [features]
+    ignore_changes = [features, mount_point]
   }
 
   cpu {
