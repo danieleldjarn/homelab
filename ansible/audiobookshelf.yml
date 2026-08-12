@@ -44,6 +44,11 @@
         state: started
         enabled: true
 
+    - name: Clean apt cache
+      ansible.builtin.apt:
+        autoclean: true
+        clean: true
+
   handlers:
     - name: Restart audiobookshelf
       ansible.builtin.systemd_service:
